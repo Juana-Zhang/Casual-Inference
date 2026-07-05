@@ -1,0 +1,11 @@
+.DS_Store
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Generated local scratch files
+tmp/
+
+# Reproducible generated tables
+data/*.csv
+outputs/*.csv

@@ -1,0 +1,14 @@
+{
+  "matched_pairs": 7899.0,
+  "treatment_pre_gmv": 268.30086395947546,
+  "treatment_post_gmv": 300.68486797037,
+  "control_pre_gmv": 267.233727492842,
+  "control_post_gmv": 281.29410127765163,
+  "treatment_relative_change": 0.12070033444165831,
+  "control_relative_change": 0.05261451807270948,
+  "did_relative_lift": 0.06808581636894884,
+  "raw_pre_baseline_gap": 0.16465579541752695,
+  "raw_naive_post_lift": 0.24250589855381643,
+  "psm_post_only_lift": 0.06893413905462142,
+  "baseline_gap_after_matching": 0.003993270148365369
+}

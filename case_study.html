@@ -1,0 +1,595 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Coupon Incrementality with PSM + DID</title>
+  <style>
+    :root {
+      --ink: #25313f;
+      --muted: #667280;
+      --line: #d9dee5;
+      --panel: #f7f8fa;
+      --panel-strong: #edf1f5;
+      --teal: #167d7f;
+      --coral: #c65d4b;
+      --gold: #9b741b;
+      --blue: #486b9a;
+      --green: #3d7d4a;
+      --white: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: #fbfbfc;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.45;
+    }
+
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 38px 28px 52px;
+    }
+
+    .profile-link {
+      display: inline-flex;
+      margin-bottom: 22px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 8px 13px;
+      background: var(--white);
+      color: var(--teal);
+      font-size: 13px;
+      font-weight: 800;
+      text-decoration: none;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 28px;
+      align-items: stretch;
+      padding-bottom: 30px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    h1 {
+      margin: 0 0 14px;
+      font-size: clamp(36px, 5vw, 62px);
+      line-height: 1.02;
+      font-weight: 780;
+      letter-spacing: 0;
+    }
+
+    h2 {
+      margin: 0 0 14px;
+      font-size: 25px;
+      letter-spacing: 0;
+    }
+
+    h3 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .eyebrow {
+      margin-bottom: 12px;
+      color: var(--coral);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .hero-copy {
+      max-width: 760px;
+      color: #425062;
+      font-size: 18px;
+    }
+
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 22px;
+    }
+
+    .hero-tag {
+      padding: 8px 11px;
+      color: #314254;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 720;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .metric {
+      min-height: 118px;
+      padding: 18px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .metric.highlight {
+      color: var(--white);
+      background: var(--ink);
+      border-color: var(--ink);
+    }
+
+    .metric strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--ink);
+      font-size: 34px;
+      line-height: 1;
+    }
+
+    .metric.highlight strong,
+    .metric.highlight span {
+      color: var(--white);
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    section {
+      padding: 34px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .story-band {
+      display: grid;
+      grid-template-columns: 0.78fr 1.22fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .story-panel {
+      padding: 22px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .story-list {
+      display: grid;
+      gap: 12px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .story-list li {
+      display: grid;
+      grid-template-columns: 122px 1fr;
+      gap: 14px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--line);
+      color: #465365;
+    }
+
+    .story-list li:last-child {
+      padding-bottom: 0;
+      border-bottom: 0;
+    }
+
+    .story-list b {
+      color: var(--ink);
+    }
+
+    .impact-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .impact-card {
+      min-height: 154px;
+      padding: 18px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    .impact-card.one {
+      background: #fff5f2;
+      border-color: #efcbc2;
+    }
+
+    .impact-card.two {
+      background: #f2faf8;
+      border-color: #c5e2dc;
+    }
+
+    .impact-card.three {
+      background: #f5f7fb;
+      border-color: #cbd8ea;
+    }
+
+    .impact-card b {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 18px;
+    }
+
+    .impact-card p {
+      font-size: 14px;
+    }
+
+    .method-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .method {
+      padding: 20px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      border-top: 5px solid var(--blue);
+    }
+
+    .method:nth-child(2) {
+      border-top-color: var(--teal);
+    }
+
+    .method:nth-child(3) {
+      border-top-color: var(--coral);
+    }
+
+    .method-label {
+      display: inline-flex;
+      margin-bottom: 12px;
+      color: #415061;
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .method ul {
+      margin: 14px 0 0;
+      padding-left: 20px;
+      color: #465365;
+    }
+
+    .method li {
+      margin: 8px 0;
+    }
+
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    figure {
+      margin: 0;
+      padding: 16px;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 6px;
+    }
+
+    figcaption {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    table {
+      width: 100%;
+      margin-top: 18px;
+      border-collapse: collapse;
+      background: var(--white);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th,
+    td {
+      padding: 13px 14px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      font-size: 14px;
+    }
+
+    th {
+      color: #3c4856;
+      background: var(--panel-strong);
+      font-weight: 800;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .callout {
+      padding: 18px;
+      background: #fff8e8;
+      border: 1px solid #ead8a8;
+      border-radius: 8px;
+      color: #594b27;
+    }
+
+    .callout p {
+      color: #594b27;
+      font-size: 15px;
+    }
+
+    code {
+      padding: 2px 5px;
+      background: var(--panel-strong);
+      border-radius: 5px;
+      font-size: 13px;
+    }
+
+    footer {
+      padding-top: 26px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        padding: 28px 18px 38px;
+      }
+
+      header,
+      .story-band,
+      .impact-grid,
+      .method-grid,
+      .chart-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .metric-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 540px) {
+      .metric-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .story-list li {
+        grid-template-columns: 1fr;
+        gap: 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <a class="profile-link" href="https://github.com/Juana-Zhang">Nuonan Zhang</a>
+    <header>
+      <div>
+        <div class="eyebrow">Synthetic Causal Inference Case</div>
+        <h1>Coupon Incrementality with PSM + Difference-in-Differences</h1>
+        <p class="hero-copy">
+          A privacy-safe recreation of a marketplace coupon campaign: use propensity score matching to build a comparable control group, then apply DID to isolate true incremental GMV from natural weekly demand movement.
+        </p>
+        <div class="hero-tags" aria-label="Project methods">
+          <span class="hero-tag">Propensity Score Matching</span>
+          <span class="hero-tag">Difference-in-Differences</span>
+          <span class="hero-tag">Incrementality</span>
+          <span class="hero-tag">Synthetic Marketplace Data</span>
+        </div>
+      </div>
+      <div class="metric-grid" aria-label="Project metrics">
+        <div class="metric highlight">
+          <strong>6.8%</strong>
+          <span>net incremental GMV lift after PSM + DID</span>
+        </div>
+        <div class="metric">
+          <strong>24.3%</strong>
+          <span>raw post-campaign lift, before causal adjustment</span>
+        </div>
+        <div class="metric">
+          <strong>7,899</strong>
+          <span>matched treatment-control pairs</span>
+        </div>
+        <div class="metric">
+          <strong>5.3%</strong>
+          <span>natural control-group weekday GMV trend</span>
+        </div>
+      </div>
+    </header>
+
+    <section class="story-band">
+      <div>
+        <h2>Project Background</h2>
+        <p>
+          Coupon campaigns can make revenue look higher even when they mainly subsidize users who were already likely to purchase. The core question is not whether treated users spent more, but whether the coupon created incremental GMV beyond the baseline trend.
+        </p>
+      </div>
+      <div class="story-panel">
+        <ul class="story-list">
+          <li>
+            <b>Business goal</b>
+            <span>Increase weekday purchase frequency among high-value marketplace users during off-peak periods.</span>
+          </li>
+          <li>
+            <b>Measurement risk</b>
+            <span>High-value users naturally spend more, so a simple treated-vs-control comparison can overstate impact.</span>
+          </li>
+          <li>
+            <b>Data strategy</b>
+            <span>Generate a synthetic user-level panel that mirrors historical GMV, purchase frequency, pre-period trend, coupon sensitivity, and city tier.</span>
+          </li>
+          <li>
+            <b>Evaluation</b>
+            <span>Use PSM to reduce selection bias, then DID to subtract the matched control group's natural demand movement.</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section>
+      <h2>Why Causal Inference</h2>
+      <p>
+        The campaign was not a clean randomized A/B test in this synthetic scenario. Coupons were more likely to target high-value users, which creates selection bias. PSM helps compare similar users, but PSM alone still cannot remove time-varying shocks such as weekly seasonality or platform-wide promotion effects.
+      </p>
+      <div class="impact-grid">
+        <article class="impact-card one">
+          <b>Naive comparison overstates lift</b>
+          <p>Post-campaign treatment users appeared 24.3% higher in the raw sample, but that number mixes targeting bias, baseline spending differences, and campaign impact.</p>
+        </article>
+        <article class="impact-card two">
+          <b>PSM creates comparable users</b>
+          <p>Users were matched on historical GMV, purchase frequency, pre-period GMV slope, weekday share, coupon sensitivity, tenure, and city tier.</p>
+        </article>
+        <article class="impact-card three">
+          <b>DID isolates net incrementality</b>
+          <p>The matched control group grew 5.3% naturally, so the final readout focuses on treatment lift over that natural trend.</p>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <h2>Method Flow</h2>
+      <div class="method-grid">
+        <article class="method">
+          <div class="method-label">Step 01</div>
+          <h3>Synthetic panel creation</h3>
+          <p>Build a privacy-safe marketplace dataset with pre/post weekday GMV and user-level targeting covariates.</p>
+          <ul>
+            <li>12,000 users and 24,000 user-period rows</li>
+            <li>Observed treatment assignment is intentionally biased toward high-value users</li>
+            <li>True coupon effect is calibrated to reproduce a 6.8% net lift case</li>
+          </ul>
+        </article>
+        <article class="method">
+          <div class="method-label">Step 02</div>
+          <h3>Propensity score matching</h3>
+          <p>Estimate each user's probability of receiving a coupon, then match treated users to nearest control users.</p>
+          <ul>
+            <li>Logistic propensity model</li>
+            <li>Nearest-neighbor matching with a propensity caliper</li>
+            <li>Balance checked with standardized mean differences</li>
+          </ul>
+        </article>
+        <article class="method">
+          <div class="method-label">Step 03</div>
+          <h3>Difference-in-Differences</h3>
+          <p>Compare pre-to-post GMV movement in the treatment group against the matched control trend.</p>
+          <ul>
+            <li>Treatment trend: +12.1%</li>
+            <li>Matched control trend: +5.3%</li>
+            <li>Net incremental lift: +6.8%</li>
+          </ul>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <h2>Results</h2>
+      <p>
+        The final result aligns with the business narrative: coupon users increased GMV, but the causal estimate is smaller and more credible after subtracting the control group's natural growth trend.
+      </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Readout</th>
+            <th>Estimate</th>
+            <th>Interpretation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Naive post-campaign comparison</td>
+            <td>24.3%</td>
+            <td>Overstates impact because coupon targeting selected users with stronger baseline value.</td>
+          </tr>
+          <tr>
+            <td>Treatment group pre-to-post change</td>
+            <td>12.1%</td>
+            <td>Total movement among coupon-targeted users after the campaign.</td>
+          </tr>
+          <tr>
+            <td>Matched control natural trend</td>
+            <td>5.3%</td>
+            <td>What similar users gained without coupon treatment.</td>
+          </tr>
+          <tr>
+            <td>PSM + DID net GMV lift</td>
+            <td>6.8%</td>
+            <td>Estimated incremental effect attributable to the coupon intervention.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>Visual Diagnostics</h2>
+      <div class="chart-grid">
+        <figure>
+          <img src="outputs/figures/matched_gmv_trend.png" alt="Matched treatment and control GMV trend from pre to post campaign">
+          <figcaption>Matched treatment users grew faster than matched controls after coupon exposure.</figcaption>
+        </figure>
+        <figure>
+          <img src="outputs/figures/covariate_balance.png" alt="Covariate balance before and after propensity score matching">
+          <figcaption>PSM reduced observable covariate imbalance before DID was applied.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section>
+      <h2>Project Takeaway</h2>
+      <div class="callout">
+        <p>
+          The key lesson is measurement discipline: PSM makes the treatment and control groups more comparable, while DID prevents natural week-over-week demand movement from being mislabeled as coupon impact. The resulting 6.8% lift is a cleaner incrementality estimate than a simple post-campaign GMV comparison.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <h2>Public Data Note</h2>
+      <p>
+        This repository uses synthetic data. It is calibrated to mirror the business mechanics and headline result from a real growth analytics case, but it does not contain proprietary user, coupon, or transaction data.
+      </p>
+    </section>
+
+    <footer>
+      Source scripts: <code>src/simulate_coupon_data.py</code> and <code>src/psm_did_analysis.py</code>.
+    </footer>
+  </main>
+</body>
+</html>
